@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { createClient } from 'edgedb'
 
 type Post = {
   id: string
@@ -6,19 +7,16 @@ type Post = {
   content: string
 }
 
+const client = createClient()
+
 export default async function Home() {
-  const posts: Post[] = [
-    {
-      id: 'post1',
-      title: 'This one weird trick makes using databases fun',
-      content: 'Use EdgeDB',
-    },
-    {
-      id: 'post2',
-      title: 'How to build a blog with EdgeDB and Next.js',
-      content: "Let's start by scaffolding our app with `create-next-app`.",
-    },
-  ]
+  const posts = await client.query<Post>(`\
+    select BlogPost {
+      id,
+      title,
+      content
+    };
+  `)
 
   return (
     <div className="container mx-auto p-4 bg-black text-white">
