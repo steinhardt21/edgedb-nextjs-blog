@@ -1,22 +1,19 @@
 import Link from 'next/link'
-import { createClient } from 'edgedb'
 
-type Post = {
-  id: string
-  title: string
-  content: string
-}
+import e from '../../dbschema/edgeql-js' // import of the query builder
+import { createClient } from 'edgedb'
 
 const client = createClient()
 
 export default async function Home() {
-  const posts = await client.query<Post>(`\
-    select BlogPost {
-      id,
-      title,
-      content
-    };
-  `)
+
+  const selectedPosts = e.select(e.BlogPost, () => ({
+    id: true,
+    title: true,
+    content: true
+  }))
+
+  const posts = await selectedPosts.run(client)
 
   return (
     <div className="container mx-auto p-4 bg-black text-white">
